@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import crypto from "crypto";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 
@@ -26,7 +25,7 @@ const sendVerificationEmail = async (email, token) => {
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Verify Your Email",
-    text: `Click here to verify your account: http://localhost:5173/verify/${token}`,
+    text: `Click here to verify your account: http://localhost:5000/auth/verify/${token}`,
   });
 };
 
@@ -35,7 +34,7 @@ export const registerCustomer = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomBytes(20).toString("hex");
+    const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     const user = await prisma.user.create({
       data: { firstName, lastName, email, password: hashedPassword, role: "customer", verificationToken },
@@ -53,7 +52,7 @@ export const registerAdmin = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomBytes(20).toString("hex");
+    const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     const user = await prisma.user.create({
       data: { firstName, lastName, email, password: hashedPassword, role: "admin", verificationToken },
@@ -70,16 +69,16 @@ export const registerAdmin = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
+const isvelid = jwt.verify(token, process.env.JWT_SECRET);
+if(!isvelid){
+    return res.status(400).json({error: "Invalid token"})
+}
     const user = await prisma.user.updateMany({
       where: { verificationToken: token },
       data: { verified: true, verificationToken: null },
     });
-
-    if (user.count > 0) {
-      res.send("Email verified successfully!");
-    } else {
-      res.status(404).send("Invalid verification token.");
-    }
+res.json({message: "Email verified successfully."})
+    
   } catch (error) {
     res.status(500).send("Error verifying email.");
   }
