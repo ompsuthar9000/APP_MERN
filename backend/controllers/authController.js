@@ -29,10 +29,18 @@ const sendVerificationEmail = async (email, token) => {
   });
 };
 
+
 // Customer Registration
 export const registerCustomer = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists." });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
@@ -51,6 +59,13 @@ export const registerCustomer = async (req, res) => {
 export const registerAdmin = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists." });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
@@ -64,6 +79,7 @@ export const registerAdmin = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Verify Email
 export const verifyEmail = async (req, res) => {
