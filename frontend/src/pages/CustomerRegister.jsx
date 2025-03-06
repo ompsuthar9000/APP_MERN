@@ -3,9 +3,14 @@ import { registerCustomer } from "../api/authApi";
 import toast, { Toaster } from "react-hot-toast";
 
 const CustomerRegister = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
+    if (data.password !== data.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
     const registerPromise = registerCustomer(data);
 
     toast.promise(registerPromise, {
@@ -58,12 +63,25 @@ const CustomerRegister = () => {
 
           <div>
             <input 
-              {...register("password", { required: "Password is required" })} 
+              {...register("password", { 
+                required: "Password is required", 
+                minLength: { value: 6, message: "Password must be at least 6 characters" } 
+              })} 
               type="password" 
               placeholder="Password" 
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          </div>
+
+          <div>
+            <input 
+              {...register("confirmPassword", { required: "Confirm Password is required" })} 
+              type="password" 
+              placeholder="Confirm Password" 
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
           </div>
 
           <button type="submit" className="mt-5 bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
