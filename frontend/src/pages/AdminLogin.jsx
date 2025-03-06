@@ -1,6 +1,7 @@
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { loginAdmin } from "../api/authApi";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 const AdminLogin = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -9,9 +10,9 @@ const AdminLogin = () => {
     const loginPromise = loginAdmin(data);
     
     toast.promise(loginPromise, {
-      loading: 'Logging in...',
-      success: 'Login Successful!',
-      error: (err) => err.message || 'Login Failed',
+      loading: "Logging in...",
+      success: "Login Successful!",
+      error: (err) => err.message || "Login Failed",
     });
 
     try {
@@ -22,64 +23,62 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <Toaster />
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-          Admin Login
-        </h2>
-      </div>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Navbar */}
+      <nav className="bg-white shadow-md p-4 flex justify-between items-center">
+        <h1 className="text-xl font-bold text-indigo-700">Admin Portal</h1>
+        <div className="space-x-4">
+          <Link to="/register/customer" className="text-indigo-600 hover:underline">
+            Register as Customer
+          </Link>
+          <Link to="/register/admin" className="text-indigo-600 hover:underline">
+            Register as Admin
+          </Link>
+        </div>
+      </nav>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-              Email address
-            </label>
-            <div className="mt-2">
+      {/* Main Content */}
+      <div className="flex flex-1 justify-center items-center p-6">
+        <Toaster />
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
+          <h2 className="text-center text-2xl font-bold text-gray-900">Admin Login</h2>
+          <form className="mt-6 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+                Email address
+              </label>
               <input
                 {...register("email", { required: "Email is required" })}
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                className="block w-full mt-2 px-3 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900">
                 Password
               </label>
-              <div className="text-sm">
-                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-            <div className="mt-2">
               <input
                 {...register("password", { required: "Password is required" })}
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                className="block w-full mt-2 px-3 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
             >
               Sign in
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -1,55 +1,75 @@
 import { useForm } from "react-hook-form";
 import { registerCustomer } from "../api/authApi";
+import toast, { Toaster } from "react-hot-toast";
 
 const CustomerRegister = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
+    const registerPromise = registerCustomer(data);
+
+    toast.promise(registerPromise, {
+      loading: "Registering...",
+      success: (response) => response.message || "Registration Successful!",
+      error: (error) => error.message || "Registration Failed!",
+    });
+
     try {
-      const response = await registerCustomer(data);
-      alert(response.message);
+      await registerPromise;
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">Customer Registration</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+      <Toaster />
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-200">
+        <h2 className="text-3xl font-semibold text-center text-blue-700 mb-6">Customer Registration</h2>
 
-        <input 
-          {...register("firstName", { required: "First name is required" })} 
-          placeholder="First Name" 
-          className="w-full px-4 py-3 mt-2 bg-gradient-to-r from-blue-300 to-indigo-400 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
+        <div className="space-y-4">
+          <div>
+            <input 
+              {...register("firstName", { required: "First name is required" })} 
+              placeholder="First Name" 
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
+          </div>
 
-        <input 
-          {...register("lastName", { required: "Last name is required" })} 
-          placeholder="Last Name" 
-          className="w-full px-4 py-3 mt-3 bg-gradient-to-r from-blue-300 to-indigo-400 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
+          <div>
+            <input 
+              {...register("lastName", { required: "Last name is required" })} 
+              placeholder="Last Name" 
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
+          </div>
 
-        <input 
-          {...register("email", { required: "Email is required" })} 
-          placeholder="Email" 
-          className="w-full px-4 py-3 mt-3 bg-gradient-to-r from-blue-300 to-indigo-400 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+          <div>
+            <input 
+              {...register("email", { required: "Email is required" })} 
+              placeholder="Email" 
+              type="email"
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+          </div>
 
-        <input 
-          {...register("password", { required: "Password is required" })} 
-          type="password" 
-          placeholder="Password" 
-          className="w-full px-4 py-3 mt-3 bg-gradient-to-r from-blue-300 to-indigo-400 text-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+          <div>
+            <input 
+              {...register("password", { required: "Password is required" })} 
+              type="password" 
+              placeholder="Password" 
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+          </div>
 
-        <button type="submit" className="mt-5 bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition duration-300">
-          Register
-        </button>
+          <button type="submit" className="mt-5 bg-blue-600 text-white w-full py-3 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+            Register
+          </button>
+        </div>
       </form>
     </div>
   );
