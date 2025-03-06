@@ -57,10 +57,17 @@ npm run dev
 ## API Endpoints
 
 ### **Authentication Routes**
-- `POST /api/auth/register-customer` - Register a customer
-- `POST /api/auth/register-admin` - Register an admin
-- `POST /api/auth/login-admin` - Admin login
-- `POST /api/auth/verify-email` - Verify user email
+- `POST /register/customer` - Register a customer
+- `POST /register/admin` - Register an admin
+- `GET /verify/:token` - Verify user email
+- `POST /login/admin` - Admin login
+
+## Frontend Routes
+
+The application uses `react-router-dom` for navigation with the following routes:
+- `/register/customer` - Customer registration page
+- `/register/admin` - Admin registration page
+- `/` - Admin login page
 
 ## Notes
 - Customers cannot log in from the admin login page.
