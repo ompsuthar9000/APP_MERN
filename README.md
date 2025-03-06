@@ -57,10 +57,10 @@ npm run dev
 ## API Endpoints
 
 ### **Authentication Routes**
-- `POST /register/customer` - Register a customer
-- `POST /register/admin` - Register an admin
-- `GET /verify/:token` - Verify user email
-- `POST /login/admin` - Admin login
+- `POST  auth/register/customer` - Register a customer
+- `POST  auth/ter/admin` - Register an admin
+- `GET  auth/:token` - Verify user email
+- `POST  auth/admin` - Admin login
 
 ## Frontend Routes
 
