@@ -1,20 +1,29 @@
 import { useForm } from "react-hook-form";
 import { registerAdmin } from "../api/authApi";
+import toast, { Toaster } from "react-hot-toast";
 
 const AdminRegister = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
 
     const onSubmit = async (data) => {
+        const registerPromise = registerAdmin(data);
+
+        toast.promise(registerPromise, {
+            loading: "Registering...",
+            success: (response) => response.message || "Registration Successful!",
+            error: (error) => error.message || "Registration Failed!",
+        });
+
         try {
-            const response = await registerAdmin(data);
-            alert(response.message);
+            await registerPromise;
         } catch (error) {
-            alert(error);
+            console.error(error);
         }
     };
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-500 to-teal-600 p-4">
+            <Toaster />
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
                 <h2 className="text-3xl font-bold text-center text-green-600 mb-6">Admin Registration</h2>
 
@@ -39,6 +48,3 @@ const AdminRegister = () => {
 };
 
 export default AdminRegister;
-
-
-
