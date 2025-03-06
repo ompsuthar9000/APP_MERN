@@ -16,7 +16,7 @@ const CustomerRegister = () => {
     toast.promise(registerPromise, {
       loading: "Registering...",
       success: (response) => response.message || "Registration Successful!",
-      error: (error) => error.message || "Registration Failed!",
+      error: (error) =>error
     });
 
     try {

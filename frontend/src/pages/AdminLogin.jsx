@@ -12,7 +12,7 @@ const AdminLogin = () => {
     toast.promise(loginPromise, {
       loading: "Logging in...",
       success: "Login Successful!",
-      error: (err) => err.message || "Login Failed "
+      error: (err) => err,
     });
 
     try {
