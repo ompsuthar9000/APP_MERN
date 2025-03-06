@@ -13,8 +13,8 @@ This project provides a role-based authentication system with email verification
 
 ### 1. Clone the Repository
 ```sh
-git clone https://github.com/your-repo-url.git
-cd react_node_postgres_auth
+git clone https://github.com/ompsuthar9000/APP_MERN.git
+cd APP_MERN
 ```
 
 ### 2. Backend Setup
