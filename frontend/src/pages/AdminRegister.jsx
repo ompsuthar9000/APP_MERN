@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { registerAdmin } from "../api/authApi";
+import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 const AdminRegister = () => {
@@ -50,6 +51,11 @@ const AdminRegister = () => {
         <button type="submit" className="mt-5 bg-green-600 text-white w-full py-3 rounded-lg hover:bg-green-700 transition duration-300">
           Register
         </button>
+
+        {/* Link to Admin Login Page */}
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account? <Link to="/" className="text-green-600 hover:underline">Login here</Link>
+        </p>
       </form>
     </div>
   );

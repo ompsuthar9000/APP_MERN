@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { registerCustomer } from "../api/authApi";
 import toast, { Toaster } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const CustomerRegister = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -16,7 +17,7 @@ const CustomerRegister = () => {
     toast.promise(registerPromise, {
       loading: "Registering...",
       success: (response) => response.message || "Registration Successful!",
-      error: (error) =>error
+      error: (error) => error
     });
 
     try {
@@ -88,6 +89,11 @@ const CustomerRegister = () => {
             Register
           </button>
         </div>
+
+        {/* Link to Admin Login Page */}
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Want to login as Admin? <Link to="/" className="text-blue-600 hover:underline">Click here</Link>
+        </p>
       </form>
     </div>
   );
