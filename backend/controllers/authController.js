@@ -158,7 +158,12 @@ export const loginAdmin = async (req, res) => {
     }
 
     const token = generateToken(user);
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+   return res.cookie('token', token, {
+      httpOnly: true, 
+      secure: true,   
+      sameSite: 'Strict', 
+      maxAge: 60 * 60 * 24 * 1000, 
+  }).status(200).json({ token, user: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
