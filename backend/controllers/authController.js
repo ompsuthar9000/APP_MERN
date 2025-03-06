@@ -3,12 +3,17 @@ import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import { getVerificationEmailTemplate } from "../utils/emailTemplate.js";
 
 dotenv.config();
 const prisma = new PrismaClient();
 
 const generateToken = (user) => {
-  return jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
 };
 
 // Email sender setup
@@ -20,15 +25,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Send Verification Email
 const sendVerificationEmail = async (email, token) => {
+  const verificationLink = `http://localhost:5000/auth/verify/${token}`;
+  
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
     subject: "Verify Your Email",
-    text: `Click here to verify your account: http://localhost:5000/auth/verify/${token}`,
+    html: getVerificationEmailTemplate(verificationLink),
   });
 };
-
 
 // Customer Registration
 export const registerCustomer = async (req, res) => {
@@ -42,10 +49,21 @@ export const registerCustomer = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const verificationToken = jwt.sign(
+      { email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    const user = await prisma.user.create({
-      data: { firstName, lastName, email, password: hashedPassword, role: "customer", verificationToken },
+    await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: "customer",
+        verificationToken,
+      },
     });
 
     await sendVerificationEmail(email, verificationToken);
@@ -67,10 +85,21 @@ export const registerAdmin = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const verificationToken = jwt.sign(
+      { email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    const user = await prisma.user.create({
-      data: { firstName, lastName, email, password: hashedPassword, role: "admin", verificationToken },
+    await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: "admin",
+        verificationToken,
+      },
     });
 
     await sendVerificationEmail(email, verificationToken);
@@ -80,23 +109,35 @@ export const registerAdmin = async (req, res) => {
   }
 };
 
-
 // Verify Email
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
-const isvelid = jwt.verify(token, process.env.JWT_SECRET);
-if(!isvelid){
-    return res.status(400).json({error: "Invalid token"})
-}
-    const user = await prisma.user.updateMany({
-      where: { verificationToken: token },
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res.status(400).json({ error: "Invalid or expired token" });
+    }
+
+    // Check if the user exists
+    const user = await prisma.user.findUnique({ where: { email: decoded.email } });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+    if (user.verified) {
+      return res.status(400).json({ error: "Email already verified" });
+    }
+
+    // Update user verification status
+    await prisma.user.update({
+      where: { email: decoded.email },
       data: { verified: true, verificationToken: null },
     });
-res.json({message: "Email verified successfully."})
-    
+
+    res.json({ message: "Email verified successfully." });
   } catch (error) {
-    res.status(500).send("Error verifying email.");
+    res.status(500).json({ error: "Error verifying email." });
   }
 };
 
