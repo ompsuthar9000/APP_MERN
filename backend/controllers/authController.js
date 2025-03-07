@@ -4,9 +4,21 @@ import { PrismaClient } from "@prisma/client";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { getVerificationEmailTemplate } from "../utils/emailTemplate.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+
+
 
 dotenv.config();
 const prisma = new PrismaClient();
+
+// Cross-platform path handling
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure the correct `views` path
+const viewsPath = path.join(__dirname, "..", "views");
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -117,7 +129,7 @@ export const verifyEmail = async (req, res) => {
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) {
-      return res.status(400).json({ error: "Invalid or expired token" });
+      return res.sendFile(path.join( viewsPath , "Error.html"));
     }
 
     // Check if the user exists
@@ -126,7 +138,7 @@ export const verifyEmail = async (req, res) => {
       return res.status(400).json({ error: "User not found" });
     }
     if (user.verified) {
-      return res.status(400).json({ error: "Email already verified" });
+      return res.sendFile(path.join( viewsPath, "EmailVerified.html"));
     }
 
     // Update user verification status
@@ -135,9 +147,9 @@ export const verifyEmail = async (req, res) => {
       data: { verified: true, verificationToken: null },
     });
 
-    res.json({ message: "Email verified successfully." });
+   return res.sendFile(path.join( viewsPath, "EmailVerified.html"));
   } catch (error) {
-    res.status(500).json({ error: "Error verifying email." });
+   return  res.sendFile(path.join( viewsPath , "Error.html"));
   }
 };
 
